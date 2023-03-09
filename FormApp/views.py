@@ -22,7 +22,7 @@ def index(request):
     return HttpResponse("Welcome to EventO")
 
 def createForm(request):
-    eventId = request.GET["eventid"]
+    eventId = request.GET["eventid"] 
 
     doc_ref = db.collection(u'Events').document(eventId)
 
