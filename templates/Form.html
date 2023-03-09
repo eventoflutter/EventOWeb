@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    EventO | Registration Form
+{% endblock title %}
+
+{% block body %}
+
+{% load static %}  
+<link href="{% static 'Form.css' %}" rel="stylesheet">  
+
+<div class="form-title">
+    <h1> Register for the Event </h1>
+    <div class="bottom-bar"></div>
+</div>
+
+<div class="form-container">
+    <div class="content">
+        <h1> {{Event_Name}} </h1>
+        <h4> {{Event_Desc}} </h4>
+        <h6> {{Event_date}} </h6>
+        <h6> {{Event_time}} </h6>
+    </div>
+    <div class="form">
+        <form>
+            {% if isName == True %}
+            <label>
+                <input type="text" placeholder="Name"/>
+            </label>
+            {% endif %}
+            {% if isPhone == True %}
+            <label>
+                <input type="Number" placeholder="WhatsApp Number"/>
+            </label>
+            {% endif %}
+            {% if isEmail == True %}
+            <label>
+                <input type="email" placeholder="Email Id"/>
+            </label>
+            {% endif %}
+            {% if isAddress == True %}
+            <label>
+                <input type="text" placeholder="Address"/>
+            </label>
+            {% endif %}
+            <button class="red" type="submit"><i class="icon ion-md-lock"></i> Register     </button>
+            
+        </form>
+    </div>
+</div>
+
+{% endblock body %}
