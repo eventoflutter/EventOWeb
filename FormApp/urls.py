@@ -4,6 +4,6 @@ from FormApp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('', views.index, name="Home"),
+    path('', views.index, name="Home"),
     path('EventForm', views.createForm, name="Form")
 ]
