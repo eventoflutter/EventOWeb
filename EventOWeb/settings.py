@@ -51,7 +51,7 @@ MIDDLEWARE = [
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://theevento.live/'
+    'https://theevento.live',
 ]
 
 ROOT_URLCONF = 'EventOWeb.urls'
