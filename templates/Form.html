@@ -22,25 +22,26 @@
         <h6> {{Event_time}} </h6>
     </div>
     <div class="form">
-        <form>
+        <form action="/create" method="post">{% csrf_token %}
+            <input type="hidden" name="eventid" value="{{eventid}}">
             {% if isName == True %}
             <label>
-                <input type="text" placeholder="Name"/>
+                <input type="text" name="vname" placeholder="Name"/>
             </label>
             {% endif %}
             {% if isPhone == True %}
             <label>
-                <input type="Number" placeholder="WhatsApp Number"/>
+                <input type="Number" name="phone" placeholder="WhatsApp Number"/>
             </label>
             {% endif %}
             {% if isEmail == True %}
             <label>
-                <input type="email" placeholder="Email Id"/>
+                <input type="email" name="email" placeholder="Email Id"/>
             </label>
             {% endif %}
             {% if isAddress == True %}
             <label>
-                <input type="text" placeholder="Address"/>
+                <input type="text" name="address" placeholder="Address"/>
             </label>
             {% endif %}
             <button class="red" type="submit"><i class="icon ion-md-lock"></i> Register     </button>

@@ -24,6 +24,9 @@
     width: 320px;
     border-radius: 20px;
     box-shadow: 2px 2px 20px #0000003c ;
+    background-image: url('/static/card_demo_4.jpg');
+    background-position: bottom;
+    background-size: contain;
     background-color: rgba(33, 150, 243, 1);
     overflow: hidden;
   }

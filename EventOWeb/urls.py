@@ -19,5 +19,4 @@ from django.urls import path, include
 urlpatterns = [
     path('adminlogin/', admin.site.urls),
     path('', include('FormApp.urls')),
-    path('Form/', include('FormApp.urls'))
 ]

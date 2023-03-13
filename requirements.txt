@@ -1,2 +1,5 @@
 Django==4.1.7
 firebase_admin==6.1.0
+GrabzIt==3.5.2
+Pillow==9.4.0
+qrcode==7.4.2
