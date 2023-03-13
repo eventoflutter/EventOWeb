@@ -50,6 +50,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://theevento.live/'
+]
+
 ROOT_URLCONF = 'EventOWeb.urls'
 
 TEMPLATES = [
