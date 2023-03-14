@@ -106,7 +106,7 @@ def save(request):
 
     id = request.GET['id']
 
-    result = grabzIt.GetResult(id)
+    result = grabzIt.GetResultObject(grabzIt.GetResult(id))  
 
     bucket = storage.bucket()
 
