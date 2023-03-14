@@ -68,27 +68,20 @@ def createImage(request):
 
     makeQR(visitorRef)
 
-
     bucket = storage.bucket()
 
     qrcodefile = visitorRef + '.png' 
 
     blob = bucket.blob('QRCodes/' + qrcodefile)
  
-    blob.upload_from_filename(qrcodefile)
+    blob.upload_from_filename('static/' + qrcodefile)
 
     blob.make_public()
-
-    print(blob.public_url)
-
-    # template = loader.render_to_string("Passes/template_1.html", {"EventName" : "MET UTSAV 2023"})
 
     grabzIt = GrabzItClient.GrabzItClient("NGZkN2U2ODU5OGU5NDI1MDkwY2Q5ZGU3Y2E4ZmFmNmQ=", "TVMcMj8/CDs/OBs/Pz8FPz9ROT8/Pz8/Pz8/Hz8zPz8=")
 
     options = GrabzItImageOptions.GrabzItImageOptions()
     options.hd = True
-    # options.width = 500
-    # options.height = 500
     options.targetElement = "#main-container"
     options.format = "png"
 
@@ -96,6 +89,7 @@ def createImage(request):
 
     grabzIt.URLToImage(url, options)
     grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
+
 
     return HttpResponse(render(request, "created.html", {"Dir" : blob.public_url})) 
 
@@ -141,6 +135,9 @@ def registerVisitor(request):
         'visitorId' : newVisitor.id,
     }
 
+    if(event['IsQr']):
+        data['Scans_rem'] = event['Scans']
+
     if(event['FormName'] == True):
         data['Name'] = request.POST['vname']
 
@@ -166,7 +163,7 @@ def makeQR(visitorId):
     mask = colormasks.HorizontalGradiantColorMask(back_color=(255,255,255), left_color=(52, 148, 230), right_color=(236, 110, 173))
 
     img_1 = qr.make_image(image_factory=StyledPilImage, module_drawer=RoundedModuleDrawer(), color_mask=mask)
-    img_1.save(os.path.join(visitorId + '.png'))
+    img_1.save(os.path.join('static/' + visitorId + '.png'))
 
 def createEventObj(doc):
     data = doc.to_dict()
