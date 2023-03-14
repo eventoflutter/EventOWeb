@@ -3,6 +3,7 @@ from django.template import loader
 import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import firestore
+from firebase_admin import storage
 import os
 from .models import Event
 from EventOWeb.settings import BASE_DIR
@@ -15,11 +16,13 @@ from qrcode.image.styledpil import StyledPilImage
 from qrcode.image.styles.moduledrawers import RoundedModuleDrawer
 from qrcode.image.styles import colormasks
 
+import PIL
+
 # Use a service account.
 serviceAccount = os.path.join(BASE_DIR, 'FormApp/path/to/evento-9a40a-9940427641e4.json')
 cred = credentials.Certificate(serviceAccount)
 
-app = firebase_admin.initialize_app(cred)
+app = firebase_admin.initialize_app(cred, {'storageBucket': 'evento-9a40a.appspot.com'})
 
 db = firestore.client()
 
@@ -65,23 +68,36 @@ def createImage(request):
 
     makeQR(visitorRef)
 
+
+    bucket = storage.bucket()
+
+    qrcodefile = visitorRef + '.png' 
+
+    blob = bucket.blob('QRCodes/' + qrcodefile)
+ 
+    blob.upload_from_filename(qrcodefile)
+
+    blob.make_public()
+
+    print(blob.public_url)
+
     # # template = loader.render_to_string("Passes/template_1.html", {"EventName" : "MET UTSAV 2023"})
 
-    # grabzIt = GrabzItClient.GrabzItClient("NGZkN2U2ODU5OGU5NDI1MDkwY2Q5ZGU3Y2E4ZmFmNmQ=", "TVMcMj8/CDs/OBs/Pz8FPz9ROT8/Pz8/Pz8/Hz8zPz8=")
+    grabzIt = GrabzItClient.GrabzItClient("NGZkN2U2ODU5OGU5NDI1MDkwY2Q5ZGU3Y2E4ZmFmNmQ=", "TVMcMj8/CDs/OBs/Pz8FPz9ROT8/Pz8/Pz8/Hz8zPz8=")
 
-    # options = GrabzItImageOptions.GrabzItImageOptions()
-    # options.hd = True
-    # # options.width = 500
-    # # options.height = 500
-    # options.targetElement = "#main-container"
-    # options.format = "png"
+    options = GrabzItImageOptions.GrabzItImageOptions()
+    options.hd = True
+    # options.width = 500
+    # options.height = 500
+    options.targetElement = "#main-container"
+    options.format = "png"
 
-    # url = "https://theevento.live/temp_1?eventid="+ eventId + "&visitorid=" + visitorRef
+    url = "https://theevento.live/temp_1?eventid="+ eventId + "&visitorid=" + visitorRef
 
-    # grabzIt.URLToImage(url, options)
-    # grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
+    grabzIt.URLToImage(url, options)
+    grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
 
-    return HttpResponse(render(request, "created.html", {"Dir" : BASE_DIR}))
+    return HttpResponse(render(request, "created.html", {"Dir" : blob.public_url})) 
 
 def temp_1(request):
 
@@ -94,9 +110,11 @@ def temp_1(request):
 
     event = createEventObj(doc)
 
+    qrcodeurl = "https://storage.googleapis.com/evento-9a40a.appspot.com/QRCodes/" + visitorid + ".png"
+
     context = {
         'eventid': eventid,
-        'visitorid': visitorid+'.png',
+        'qrurl': qrcodeurl,
         'Event_Name' : event.name,
         'Event_Desc' : event.desc,
         'Event_date' : event.time.strftime("%d"),
