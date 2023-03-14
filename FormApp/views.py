@@ -79,7 +79,7 @@ def createImage(request):
     grabzIt.URLToImage(url, options)
     grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
 
-    return render(request, "created.html", {})
+    return HttpResponse(render(request, "created.html", {}))
 
 def temp_1(request):
 
