@@ -63,23 +63,23 @@ def createImage(request):
 
     print(BASE_DIR)
 
-    makeQR(visitorRef)
+    # makeQR(visitorRef)
 
-    # template = loader.render_to_string("Passes/template_1.html", {"EventName" : "MET UTSAV 2023"})
+    # # template = loader.render_to_string("Passes/template_1.html", {"EventName" : "MET UTSAV 2023"})
 
-    grabzIt = GrabzItClient.GrabzItClient("NGZkN2U2ODU5OGU5NDI1MDkwY2Q5ZGU3Y2E4ZmFmNmQ=", "TVMcMj8/CDs/OBs/Pz8FPz9ROT8/Pz8/Pz8/Hz8zPz8=")
+    # grabzIt = GrabzItClient.GrabzItClient("NGZkN2U2ODU5OGU5NDI1MDkwY2Q5ZGU3Y2E4ZmFmNmQ=", "TVMcMj8/CDs/OBs/Pz8FPz9ROT8/Pz8/Pz8/Hz8zPz8=")
 
-    options = GrabzItImageOptions.GrabzItImageOptions()
-    options.hd = True
-    # options.width = 500
-    # options.height = 500
-    options.targetElement = "#main-container"
-    options.format = "png"
+    # options = GrabzItImageOptions.GrabzItImageOptions()
+    # options.hd = True
+    # # options.width = 500
+    # # options.height = 500
+    # options.targetElement = "#main-container"
+    # options.format = "png"
 
-    url = "https://theevento.live/temp_1?eventid="+ eventId + "&visitorid=" + visitorRef
+    # url = "https://theevento.live/temp_1?eventid="+ eventId + "&visitorid=" + visitorRef
 
-    grabzIt.URLToImage(url, options)
-    grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
+    # grabzIt.URLToImage(url, options)
+    # grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
 
     return HttpResponse(render(request, "created.html", {}))
 
