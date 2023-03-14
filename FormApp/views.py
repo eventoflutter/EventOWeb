@@ -61,6 +61,8 @@ def createImage(request):
 
     visitorRef = registerVisitor(request)
 
+    print(BASE_DIR)
+
     makeQR(visitorRef)
 
     # template = loader.render_to_string("Passes/template_1.html", {"EventName" : "MET UTSAV 2023"})
