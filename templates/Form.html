@@ -22,7 +22,8 @@
         <h6> {{Event_time}} </h6>
     </div>
     <div class="form">
-        <form action="/create" method="post">{% csrf_token %}
+        <form action="/create" method="post">
+            {% csrf_token %}
             <input type="hidden" name="eventid" value="{{eventid}}">
             {% if isName == True %}
             <label>

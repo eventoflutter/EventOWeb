@@ -63,7 +63,7 @@ def createImage(request):
 
     makeQR(visitorRef)
 
-    template = loader.render_to_string("Passes/template_1.html", {"EventName" : "MET UTSAV 2023"})
+    # template = loader.render_to_string("Passes/template_1.html", {"EventName" : "MET UTSAV 2023"})
 
     grabzIt = GrabzItClient.GrabzItClient("NGZkN2U2ODU5OGU5NDI1MDkwY2Q5ZGU3Y2E4ZmFmNmQ=", "TVMcMj8/CDs/OBs/Pz8FPz9ROT8/Pz8/Pz8/Hz8zPz8=")
 
@@ -79,7 +79,7 @@ def createImage(request):
     grabzIt.URLToImage(url, options)
     grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
 
-    return HttpResponse("Done")
+    return render(request, "created.html", {})
 
 def temp_1(request):
 
