@@ -7,5 +7,4 @@ urlpatterns = [
     path('EventForm', views.createForm, name="Form"),
     path('create', views.createImage),
     path('temp_1', views.temp_1),   
-    path('save/', views.save)
 ]

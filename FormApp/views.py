@@ -96,26 +96,8 @@ def createImage(request):
 
     grabzIt.URLToImage(url, options)
     grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
-    grabzIt.Save('http://theevento.live/save') 
-
 
     return HttpResponse(render(request, "created.html", {"Dir" : blob.public_url})) 
-
-def save(request):
-    grabzIt = GrabzItClient.GrabzItClient("NGZkN2U2ODU5OGU5NDI1MDkwY2Q5ZGU3Y2E4ZmFmNmQ=", "TVMcMj8/CDs/OBs/Pz8FPz9ROT8/Pz8/Pz8/Hz8zPz8=")
-
-    id = request.GET['id']
-
-    result = grabzIt.GetResultObject(grabzIt.GetResult(id))  
-
-    bucket = storage.bucket()
-
-    blob2 = bucket.blob("Cards/final.png")
-
-    blob2.upload_from_file(result)
-
-    blob2.make_public()
-
 
 def temp_1(request):
 
