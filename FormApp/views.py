@@ -146,7 +146,7 @@ def makeQR(visitorId):
     mask = colormasks.HorizontalGradiantColorMask(back_color=(255,255,255), left_color=(52, 148, 230), right_color=(236, 110, 173))
 
     img_1 = qr.make_image(image_factory=StyledPilImage, module_drawer=RoundedModuleDrawer(), color_mask=mask)
-    img_1.save(os.path.join(BASE_DIR, 'static/' + visitorId + '.png'))
+    img_1.save(os.path.join(BASE_DIR, 'EventOWeb/static/' + visitorId + '.png'))
 
 def createEventObj(doc):
     data = doc.to_dict()
