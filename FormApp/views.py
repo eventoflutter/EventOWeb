@@ -47,7 +47,7 @@ def createForm(request):
     context = {
         'eventid': eventId,
         'Event_Name' : event.name,
-        'Event_Desc' : event.desc,
+        'Event_Desc' : BASE_DIR,
         'Event_date' : strtdate,
         'Event_time' : strttime,
         'isName' : event.isName,
@@ -89,7 +89,6 @@ def createImage(request):
 
     grabzIt.URLToImage(url, options)
     grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
-
 
     return HttpResponse(render(request, "created.html", {"Dir" : blob.public_url})) 
 
@@ -158,7 +157,6 @@ def makeQR(visitorId):
 
     qr= qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L,border=1,)
     qr.add_data(visitorId)
-
 
     mask = colormasks.HorizontalGradiantColorMask(back_color=(255,255,255), left_color=(52, 148, 230), right_color=(236, 110, 173))
 
