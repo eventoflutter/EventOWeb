@@ -8,6 +8,9 @@ import os
 from .models import Event
 from EventOWeb.settings import BASE_DIR
 
+from django.conf import settings
+import requests
+
 from GrabzIt import GrabzItImageOptions
 from GrabzIt import GrabzItClient
 
@@ -61,13 +64,109 @@ def createForm(request):
 def createImage(request):
 
     eventId = request.POST['eventid']
-
     visitorRef = registerVisitor(request)
 
-    print(BASE_DIR)
-
+    # Generate QR code 
     makeQR(visitorRef)
 
+    # Upload QR code to firebase storage 
+    blob = uploadQR(visitorRef)
+ 
+    # Take screenshot of the Card i.e. Generate the card
+    takeScreenshot(eventId, visitorRef)
+
+    # Upload the Card to the firebase storage
+    card = uploadCard(visitorRef)
+
+    SendMessageOnMessage(request, eventId, card)
+
+    os.remove(os.path.join(BASE_DIR, 'static/' + visitorRef + '.png')) 
+    os.remove(os.path.join(BASE_DIR, 'static/' + visitorRef + 'Card.png')) 
+
+    return HttpResponse(render(request, "created.html", {"Dir" : blob.public_url})) 
+
+def SendMessageOnMessage(request, eventId, card):
+    event_ref = db.collection(u'Events').document(eventId)
+
+    doc = event_ref.get()
+
+    event = createEventObj(doc)
+
+    name = request.POST['vname']
+
+    phonenumber = "91" + request.POST['phone']
+
+    headers = {"Authorization" : settings.WHATSAPP_TOKEN}
+    
+    payload ={
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": phonenumber,
+                "type": "template",
+                "template": {
+                    "name": "template_for_pass_sending",
+                    "language": {
+                        "code": "en_US"
+                    },
+                    "components": [
+                        {
+                        "type": "header",
+                        "parameters": [
+                            {
+                                "type": "image",
+                                "image": {
+                                    "link": card.public_url
+                                }
+                            }
+                        ]
+                        },
+                        {
+                        "type": "body",
+                        "parameters": [
+                            {
+                            "type": "text",
+                            "text": name
+                            },
+                            {
+                            "type": "text",
+                            "text": event.name
+                            }
+                        ]
+                        }
+                    ]
+                }
+            }
+
+    response = requests.post(settings.WHATSAPP_URL, headers=headers, json=payload)
+
+    ans = response.json()
+
+def uploadCard(visitorRef):
+    bucket = storage.bucket()
+
+    finalCard = visitorRef + 'Card.png' 
+
+    blob = bucket.blob('Cards/' + finalCard)
+ 
+    blob.upload_from_filename('static/' + finalCard)
+
+    blob.make_public()
+    return blob
+
+def takeScreenshot(eventId, visitorRef):
+    grabzIt = GrabzItClient.GrabzItClient("ZTQ2NTA1ZWRmZWI0NDgyM2FmOGFmYjAyMzMwNTM2Njg=", "Nz8/Mj8+P0I/OWM/KUI8P0YFP305Pz8/Pyc/Wz8tPz8=") 
+
+    options = GrabzItImageOptions.GrabzItImageOptions()
+    options.hd = True
+    options.targetElement = "#main-container"
+    options.format = "png"
+
+    url = "https://theevento.live/temp_1?eventid="+ eventId + "&visitorid=" + visitorRef
+
+    grabzIt.URLToImage(url, options)
+    grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/' + visitorRef + 'Card.png'))
+
+def uploadQR(visitorRef):
     bucket = storage.bucket()
 
     qrcodefile = visitorRef + '.png' 
@@ -78,19 +177,7 @@ def createImage(request):
 
     blob.make_public()
 
-    grabzIt = GrabzItClient.GrabzItClient("NGZkN2U2ODU5OGU5NDI1MDkwY2Q5ZGU3Y2E4ZmFmNmQ=", "TVMcMj8/CDs/OBs/Pz8FPz9ROT8/Pz8/Pz8/Hz8zPz8=")
-
-    options = GrabzItImageOptions.GrabzItImageOptions()
-    options.hd = True
-    options.targetElement = "#main-container"
-    options.format = "png"
-
-    url = "https://theevento.live/temp_1?eventid="+ eventId + "&visitorid=" + visitorRef
-
-    grabzIt.URLToImage(url, options)
-    grabzIt.SaveTo(os.path.join(BASE_DIR, 'static/finalCard.png'))
-
-    return HttpResponse(render(request, "created.html", {"Dir" : blob.public_url})) 
+    return blob
 
 def temp_1(request):
 
@@ -158,9 +245,9 @@ def makeQR(visitorId):
     qr= qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_L,border=1,)
     qr.add_data(visitorId)
 
-    mask = colormasks.HorizontalGradiantColorMask(back_color=(255,255,255), left_color=(52, 148, 230), right_color=(236, 110, 173))
+    # mask = colormasks.HorizontalGradiantColorMask(back_color=(255,255,255), left_color=(52, 148, 230), right_color=(236, 110, 173))
 
-    img_1 = qr.make_image(image_factory=StyledPilImage, module_drawer=RoundedModuleDrawer(), color_mask=mask)
+    img_1 = qr.make_image(image_factory=StyledPilImage, module_drawer=RoundedModuleDrawer())
     img_1.save(os.path.join(BASE_DIR, 'static/' + visitorId + '.png'))
 
 def createEventObj(doc):
