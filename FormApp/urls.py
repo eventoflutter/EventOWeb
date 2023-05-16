@@ -6,5 +6,6 @@ urlpatterns = [
     path('', views.index, name="Home"),
     path('EventForm', views.createForm, name="Form"),
     path('create', views.createImage),
-    path('temp_1', views.temp_1),   
+    path('temp_1', views.temp_1), 
+    path('csvpasses', views.csvPasses),  
 ]

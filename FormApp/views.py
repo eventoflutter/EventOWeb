@@ -61,6 +61,35 @@ def createForm(request):
 
     return render(request, "Form.html", context)
 
+def csvPasses(request):
+    eventId = request.GET['eventid']
+
+    visitors = db.collections(u'Events').document(eventId).collection(u'Visitors').where("Category", "==", "CSV").get()
+
+    for i in visitors:
+        visitor = i.to_dict()
+
+        id = i.id
+
+        # Generate QR code 
+        makeQR(id)
+
+        # Upload QR code to firebase storage 
+        blob = uploadQR(id)
+    
+        # Take screenshot of the Card i.e. Generate the card
+        takeScreenshot(eventId, id)
+
+        # Upload the Card to the firebase storage
+        card = uploadCard(id)
+
+        sendMessageCSV(visitor, eventId, card)
+
+        os.remove(os.path.join(BASE_DIR, 'static/' + id + '.png')) 
+        os.remove(os.path.join(BASE_DIR, 'static/' + id + 'Card.png')) 
+
+    return {"Sent" : True}
+
 def createImage(request):
 
     eventId = request.POST['eventid']
@@ -141,6 +170,63 @@ def SendMessageOnMessage(request, eventId, card):
 
     ans = response.json()
 
+def sendMessageCSV(visitor, eventId, card):
+
+    event_ref = db.collection(u'Events').document(eventId)
+
+    doc = event_ref.get()
+
+    event = createEventObj(doc)
+
+    name = visitor["Name"]
+
+    phonenumber = "91" + visitor["Phone"]
+    
+    headers = {"Authorization" : settings.WHATSAPP_TOKEN}
+    
+    payload ={
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": phonenumber,
+                "type": "template",
+                "template": {
+                    "name": "template_for_pass_sending",
+                    "language": {
+                        "code": "en_US"
+                    },
+                    "components": [
+                        {
+                        "type": "header",
+                        "parameters": [
+                            {
+                                "type": "image",
+                                "image": {
+                                    "link": card.public_url
+                                }
+                            }
+                        ]
+                        },
+                        {
+                        "type": "body",
+                        "parameters": [
+                            {
+                            "type": "text",
+                            "text": name
+                            },
+                            {
+                            "type": "text",
+                            "text": event.name
+                            }
+                        ]
+                        }
+                    ]
+                }
+            }
+
+    response = requests.post(settings.WHATSAPP_URL, headers=headers, json=payload)
+
+    ans = response.json()
+
 def uploadCard(visitorRef):
     bucket = storage.bucket()
 
@@ -154,7 +240,7 @@ def uploadCard(visitorRef):
     return blob
 
 def takeScreenshot(eventId, visitorRef):
-    grabzIt = GrabzItClient.GrabzItClient("ZTQ2NTA1ZWRmZWI0NDgyM2FmOGFmYjAyMzMwNTM2Njg=", "Nz8/Mj8+P0I/OWM/KUI8P0YFP305Pz8/Pyc/Wz8tPz8=") 
+    grabzIt = GrabzItClient.GrabzItClient("NjQzNTYyMGJjNWU3NGE1ZWFjODM0YjVkMTA0YjNiZjI=", "Pz8/P1QFPzBxPz8BPz8/PzU/PzA/Fz9tPwJVPzw/SVI=")
 
     options = GrabzItImageOptions.GrabzItImageOptions()
     options.hd = True
@@ -267,4 +353,3 @@ def createEventObj(doc):
     )
 
     return event
- 
