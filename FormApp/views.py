@@ -64,31 +64,37 @@ def createForm(request):
 def csvPasses(request):
     eventId = request.GET['eventid']
 
-    visitors = db.collections(u'Events').document(eventId).collection(u'Visitors').where("Category", "==", "CSV").get()
+    print(eventId)
+    visitors = db.collection(u'Events').document(eventId).collection(u'Visitors').where("Category", "==", "CSV").get()
 
     for i in visitors:
         visitor = i.to_dict()
 
         id = i.id
 
+        print(visitor["Name"])  
+
         # Generate QR code 
         makeQR(id)
 
-        # Upload QR code to firebase storage 
+        # # Upload QR code to firebase storage 
         blob = uploadQR(id)
     
-        # Take screenshot of the Card i.e. Generate the card
+        # # Take screenshot of the Card i.e. Generate the card
         takeScreenshot(eventId, id)
 
-        # Upload the Card to the firebase storage
+        # # Upload the Card to the firebase storage
         card = uploadCard(id)
+ 
+        print("sc taken")
 
-        sendMessageCSV(visitor, eventId, card)
+        sendMessageCSV(visitor, eventId, card) 
+
 
         os.remove(os.path.join(BASE_DIR, 'static/' + id + '.png')) 
-        os.remove(os.path.join(BASE_DIR, 'static/' + id + 'Card.png')) 
+        os.remove(os.path.join(BASE_DIR, 'static/' + id + 'Card.png'))
 
-    return {"Sent" : True}
+    return HttpResponse('{"Sent" : "Success"}')
 
 def createImage(request):
 
@@ -104,7 +110,7 @@ def createImage(request):
     # Take screenshot of the Card i.e. Generate the card
     takeScreenshot(eventId, visitorRef)
 
-    # Upload the Card to the firebase storage
+    # # Upload the Card to the firebase storage
     card = uploadCard(visitorRef)
 
     SendMessageOnMessage(request, eventId, card)
@@ -170,6 +176,8 @@ def SendMessageOnMessage(request, eventId, card):
 
     ans = response.json()
 
+    print(ans) 
+
 def sendMessageCSV(visitor, eventId, card):
 
     event_ref = db.collection(u'Events').document(eventId)
@@ -180,8 +188,10 @@ def sendMessageCSV(visitor, eventId, card):
 
     name = visitor["Name"]
 
-    phonenumber = "91" + visitor["Phone"]
-    
+    phonenumber = "91" + str(visitor["Number"])
+
+    print(phonenumber)
+
     headers = {"Authorization" : settings.WHATSAPP_TOKEN}
     
     payload ={
@@ -223,9 +233,13 @@ def sendMessageCSV(visitor, eventId, card):
                 }
             }
 
+    print(phonenumber) 
+
     response = requests.post(settings.WHATSAPP_URL, headers=headers, json=payload)
 
     ans = response.json()
+
+    print(ans) 
 
 def uploadCard(visitorRef):
     bucket = storage.bucket()
@@ -240,7 +254,7 @@ def uploadCard(visitorRef):
     return blob
 
 def takeScreenshot(eventId, visitorRef):
-    grabzIt = GrabzItClient.GrabzItClient("NjQzNTYyMGJjNWU3NGE1ZWFjODM0YjVkMTA0YjNiZjI=", "Pz8/P1QFPzBxPz8BPz8/PzU/PzA/Fz9tPwJVPzw/SVI=")
+    grabzIt = GrabzItClient.GrabzItClient("ZDFhZGFiYmM4ZmNlNDA1MDgyZmU4MzVmNjgzNjI3Yzk=", "CTttPzw/Pz8/eSEjP2ZEJ3sCPz8/Pz8/bz8EPz8/P14=")
 
     options = GrabzItImageOptions.GrabzItImageOptions()
     options.hd = True
