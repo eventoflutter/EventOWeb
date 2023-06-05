@@ -50,7 +50,7 @@ def createForm(request):
     context = {
         'eventid': eventId,
         'Event_Name' : event.name,
-        'Event_Desc' : BASE_DIR,
+        'Event_Desc' : event.desc,
         'Event_date' : strtdate,
         'Event_time' : strttime,
         'isName' : event.isName,
@@ -90,7 +90,6 @@ def csvPasses(request):
 
         sendMessageCSV(visitor, eventId, card) 
 
-
         os.remove(os.path.join(BASE_DIR, 'static/' + id + '.png')) 
         os.remove(os.path.join(BASE_DIR, 'static/' + id + 'Card.png'))
 
@@ -101,24 +100,27 @@ def createImage(request):
     eventId = request.POST['eventid']
     visitorRef = registerVisitor(request)
 
-    # Generate QR code 
+    # # Generate QR code 
     makeQR(visitorRef)
 
-    # Upload QR code to firebase storage 
+    # # Upload QR code to firebase storage 
     blob = uploadQR(visitorRef)
+
+    print("1")
  
-    # Take screenshot of the Card i.e. Generate the card
+    # # Take screenshot of the Card i.e. Generate the card
     takeScreenshot(eventId, visitorRef)
 
-    # # Upload the Card to the firebase storage
+    print("2")
+    # # # Upload the Card to the firebase storage
     card = uploadCard(visitorRef)
 
     SendMessageOnMessage(request, eventId, card)
 
     os.remove(os.path.join(BASE_DIR, 'static/' + visitorRef + '.png')) 
-    os.remove(os.path.join(BASE_DIR, 'static/' + visitorRef + 'Card.png')) 
+    os.remove(os.path.join(BASE_DIR, 'static/' + visitorRef + 'Card.png'))  
 
-    return HttpResponse(render(request, "created.html", {"Dir" : blob.public_url})) 
+    return HttpResponse(render(request, "created.html")) 
 
 def SendMessageOnMessage(request, eventId, card):
     event_ref = db.collection(u'Events').document(eventId)
@@ -254,7 +256,7 @@ def uploadCard(visitorRef):
     return blob
 
 def takeScreenshot(eventId, visitorRef):
-    grabzIt = GrabzItClient.GrabzItClient("ZDFhZGFiYmM4ZmNlNDA1MDgyZmU4MzVmNjgzNjI3Yzk=", "CTttPzw/Pz8/eSEjP2ZEJ3sCPz8/Pz8/bz8EPz8/P14=")
+    grabzIt = GrabzItClient.GrabzItClient("NjUyOTVmN2U2NzhjNDY2ZGI0MDg5YjQ3MmMzM2ZkZjE=", "Pz9UU1U/DFwLPz8/PzU/bj8/JChdP29ZNS9rPz9qPz8=")
 
     options = GrabzItImageOptions.GrabzItImageOptions()
     options.hd = True
